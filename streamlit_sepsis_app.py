@@ -218,8 +218,37 @@ def main():
                 window_hours=24,
             )
 
-            st.subheader("Patient summary (model view)")
-            st.json(patient_summary)
+            st.subheader("Patient Summary")
+            
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("Patient ID", str(patient_summary.get("patient_id", "N/A")))
+            with col2:
+                age = patient_summary.get("demographics", {}).get("age")
+                st.metric("Age", f"{age:.0f}" if pd.notnull(age) else "N/A")
+            with col3:
+                sex = patient_summary.get("demographics", {}).get("sex")
+                st.metric("Sex", str(sex) if pd.notnull(sex) else "N/A")
+            with col4:
+                st.metric("Observation Window", f"{patient_summary.get('time_window_hours', 24)}h")
+                
+            st.markdown("**Vitals & Labs Summary**")
+            vitals = patient_summary.get("vitals_summary", {})
+            if vitals:
+                vitals_df = pd.DataFrame.from_dict(vitals, orient='index')
+                if not vitals_df.empty:
+                    vitals_df = vitals_df.rename(columns={
+                        "last": "Latest Value", 
+                        "min": "Minimum", 
+                        "max": "Maximum", 
+                        "trend": "Trend"
+                    })
+                    for c in ["Latest Value", "Minimum", "Maximum"]:
+                        if c in vitals_df.columns:
+                            vitals_df[c] = vitals_df[c].apply(lambda x: f"{x:.2f}" if isinstance(x, (int, float)) else x)
+                    st.dataframe(vitals_df, use_container_width=True)
+            else:
+                st.info("No vitals summary available.")
 
             # LLM explanation via Groq
             client = get_groq_client_from_env()
