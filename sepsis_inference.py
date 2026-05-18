@@ -101,7 +101,13 @@ def load_neural_ode_v1_checkpoint(
 ) -> Tuple[NeuralODESepsis, dict]:
     """Load NeuralODESepsis v1 checkpoint with metadata."""
 
-    map_location = torch.device(device)
+    if isinstance(device, str) and device == "cuda" and not torch.cuda.is_available():
+        device = "cpu"
+    
+    map_location = torch.device(device) if isinstance(device, str) else device
+    if map_location.type == 'cuda' and not torch.cuda.is_available():
+        map_location = torch.device('cpu')
+        
     ckpt = torch.load(ckpt_path, map_location=map_location)
 
     input_dim = ckpt["input_dim"]

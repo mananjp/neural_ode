@@ -38,6 +38,8 @@ load_dotenv(override=True)
 
 @st.cache_resource
 def load_model_and_meta(ckpt_path: str, device: str = "cpu"):
+    if device == "cuda" and not torch.cuda.is_available():
+        device = "cpu"
     device_obj = torch.device(device)
     model, meta = load_neural_ode_v1_checkpoint(ckpt_path=ckpt_path, device=device_obj)
     return model, meta, device_obj
