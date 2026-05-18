@@ -36,7 +36,7 @@ load_dotenv(override=True)
 # -----------------------------
 
 
-@st.cache_resource
+@st.cache_resource(show_spinner="Loading PyTorch model...")
 def load_model_and_meta(ckpt_path: str, device: str = "cpu"):
     if device == "cuda" and not torch.cuda.is_available():
         device = "cpu"
