@@ -228,6 +228,8 @@ def main():
                 st.metric("Age", f"{age:.0f}" if pd.notnull(age) else "N/A")
             with col3:
                 sex = patient_summary.get("demographics", {}).get("sex")
+                if pd.notnull(sex):
+                    sex = "Male" if sex == 1 else "Female"
                 st.metric("Sex", str(sex) if pd.notnull(sex) else "N/A")
             with col4:
                 st.metric("Observation Window", f"{patient_summary.get('time_window_hours', 24)}h")
