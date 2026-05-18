@@ -1,0 +1,7 @@
+streamlit
+groq
+torch
+torchdiffeq
+pandas
+numpy
+python-dotenv
